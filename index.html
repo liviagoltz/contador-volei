@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de pontos !</title>
+</head>
+<body>
+    <section>
+        <h1>Contador de Pontos !</h1>
+        <p>0</p>
+        <button onclick="aumentar()">Mais</button>
+        <button onclick="zerar()">Zerar</button>
+        <button onclick="diminuir()">Menos</button>
+
+         
+         <h1>Contador de Pontos !</h1>
+        <p id="contador2">0</p>
+        <button onclick="aumentar2()">Mais</button>
+        <button onclick="zerar2()">Zerar</button>
+        <button onclick="diminuir2()">Menos</button>
+    
+    </section> 
+   
+    <script>
+        let numero = 0; 
+        let numero2 = 0;
+
+        function aumentar(){
+            numero = numero +1
+            render1()
+        }
+        function zerar(){
+            numero = numero - numero
+            render1()
+        }
+        function diminuir(){
+            numero = numero -1
+            render1()
+        }
+        function aumentar2(){
+            numero = numero +1
+            render2()
+        }
+        function zerar2(){
+            numero = numero - numero
+            render2()
+        }
+        function diminuir2(){
+            numero = numero -1
+            render2()
+        }
+              function render1(){         
+            const p = document.querySelector("p")
+            p.innerText = numero;
+        }
+           function render2(){
+            const p2 = document.getElementById("contador2")
+            p2.innerText = numero2;
+        }
+           render1();
+           render2();
+
+    </script>
+</body>
+</html>
