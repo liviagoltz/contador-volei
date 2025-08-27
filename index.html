@@ -1,66 +1,81 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contador de pontos !</title>
+  <meta charset="UTF-8">
+  <title>Placar com Limite</title>
 </head>
 <body>
-    <section>
-        <h1>Contador de Pontos !</h1>
-        <p>0</p>
-        <button onclick="aumentar()">Mais</button>
-        <button onclick="zerar()">Zerar</button>
-        <button onclick="diminuir()">Menos</button>
+  <h1>Placar</h1>
 
-         
-         <h1>Contador de Pontos !</h1>
-        <p id="contador2">0</p>
-        <button onclick="aumentar2()">Mais</button>
-        <button onclick="zerar2()">Zerar</button>
-        <button onclick="diminuir2()">Menos</button>
-    
-    </section> 
-   
-    <script>
-        let numero = 0; 
-        let numero2 = 0;
+  <div id="setup">
+    <p>Até quantos pontos vai o jogo?</p>
+    <select id="limiteSelect">
+      <option value="15">15</option>
+      <option value="25">25</option>
+      <option value="7">7</option>
+    </select>
+    <button onclick="iniciarJogo()">Começar Jogo</button>
+  </div>
 
-        function aumentar(){
-            numero = numero +1
-            render1()
-        }
-        function zerar(){
-            numero = numero - numero
-            render1()
-        }
-        function diminuir(){
-            numero = numero -1
-            render1()
-        }
-        function aumentar2(){
-            numero = numero +1
-            render2()
-        }
-        function zerar2(){
-            numero = numero - numero
-            render2()
-        }
-        function diminuir2(){
-            numero = numero -1
-            render2()
-        }
-              function render1(){         
-            const p = document.querySelector("p")
-            p.innerText = numero;
-        }
-           function render2(){
-            const p2 = document.getElementById("contador2")
-            p2.innerText = numero2;
-        }
-           render1();
-           render2();
 
-    </script>
+  <div id="jogo" style="display: none;">
+    <h2 id="timeA">Time A: 0</h2>
+    <button onclick="aumentarPlacar('A')">+</button>
+
+    <h2 id="timeB">Time B: 0</h2>
+    <button onclick="aumentarPlacar('B')">+</button>
+
+    <br><br>
+    <button onclick="zerarPlacar()">Zerar Placar</button>
+
+    <h3 id="mensagemFinal"></h3>
+  </div>
+
+  <script>
+    let placarA = 0;
+    let placarB = 0;
+    let limite = 15;
+    let jogoFinalizado = false;
+
+    function iniciarJogo() {
+      const select = document.getElementById('limiteSelect');
+      limite = parseInt(select.value);
+      document.getElementById('setup').style.display = 'none';
+      document.getElementById('jogo').style.display = 'block';
+      resetarTudo();
+    }
+
+    function aumentarPlacar(time) {
+      if (jogoFinalizado) return;
+
+      if (time === 'A') {
+        placarA++;
+        document.getElementById('timeA').textContent = `Time A: ${placarA}`;
+        if (placarA >= limite) finalizarJogo('Time A');
+      } else if (time === 'B') {
+        placarB++;
+        document.getElementById('timeB').textContent = `Time B: ${placarB}`;
+        if (placarB >= limite) finalizarJogo('Time B');
+      }
+    }
+
+    function finalizarJogo(vencedor) {
+      jogoFinalizado = true;
+      document.getElementById('mensagemFinal').textContent = `${vencedor} venceu o jogo!`;
+    }
+
+    function zerarPlacar() {
+      placarA = 0;
+      placarB = 0;
+      jogoFinalizado = false;
+      document.getElementById('timeA').textContent = 'Time A: 0';
+      document.getElementById('timeB').textContent = 'Time B: 0';
+      document.getElementById('mensagemFinal').textContent = '';
+    }
+
+    function resetarTudo() {
+      zerarPlacar();
+    }
+  </script>
 </body>
 </html>
