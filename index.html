@@ -1,81 +1,117 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Placar com Limite</title>
+<meta charset="UTF-8" />
+<title>Placar resumido</title>
+<style>
+  body{font-family:sans-serif;display:flex;flex-direction:column;align-items:center;background:#a0c4ff;color:#222;min-height:100vh;margin:20px;}
+  #jogo{display:none;max-width:400px;width:100%;background:#fff;padding:15px;border-radius:8px;text-align:center;}
+  .times{display:flex;justify-content:center;gap:30px;margin:20px 0;}
+  .time{flex:1;min-width:100px;}
+  .placar{font-size:48px;font-weight:bold;}
+  .vencedor{color:green;}
+  .perdedor{color:red;}
+  button{padding:10px 20px;margin-top:10px;font-size:16px;border:none;border-radius:6px;background:#0077cc;color:#fff;cursor:pointer;}
+  button:disabled{background:#aaccee;cursor:not-allowed;}
+</style>
 </head>
 <body>
-  <h1>Placar</h1>
 
-  <div id="setup">
-    <p>Até quantos pontos vai o jogo?</p>
-    <select id="limiteSelect">
-      <option value="15">15</option>
-      <option value="25">25</option>
-      <option value="7">7</option>
+<h1>Placar</h1>
+<div id="setup">
+  <label>Até quantos pontos? 
+    <select id="limite">
+      <option>7</option><option>15</option><option>25</option>
     </select>
-    <button onclick="iniciarJogo()">Começar Jogo</button>
+  </label>
+  <button onclick="start()">Começar</button>
+</div>
+
+<div id="jogo">
+  <div class="times">
+    <div class="time">
+      <div>Time A</div>
+      <div id="placarA" class="placar">0</div>
+      <button onclick="pontuar('A')">+1 Time A</button>
+    </div>
+    <div class="time">
+      <div>Time B</div>
+      <div id="placarB" class="placar">0</div>
+      <button onclick="pontuar('B')">+1 Time B</button>
+    </div>
   </div>
+  <button onclick="resetar()">Zerar Placar</button>
+  <h3 id="msg"></h3>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script>
+let limiteBase, limiteAtual, A=0, B=0, fim=false;
+const placarA=document.getElementById('placarA'), placarB=document.getElementById('placarB'), msg=document.getElementById('msg');
 
-  <div id="jogo" style="display: none;">
-    <h2 id="timeA">Time A: 0</h2>
-    <button onclick="aumentarPlacar('A')">+</button>
+function start(){
+  limiteBase=parseInt(document.getElementById('limite').value);
+  limiteAtual=limiteBase; A=0; B=0; fim=false; msg.textContent='';
+  document.getElementById('setup').style.display='none';
+  document.getElementById('jogo').style.display='block';
+  atualizar();
+}
 
-    <h2 id="timeB">Time B: 0</h2>
-    <button onclick="aumentarPlacar('B')">+</button>
+function pontuar(time){
+  if(fim) return;
+  if(time==='A') A++; else B++;
+  checarFim();
+  atualizar();
+}
 
-    <br><br>
-    <button onclick="zerarPlacar()">Zerar Placar</button>
+function checarFim(){
+  if((A>=limiteAtual||B>=limiteAtual) && Math.abs(A-B)>=2){
+    fim=true;
+    msg.textContent=`${A>B?'Time A':'Time B'} venceu!`;
+    confete();
+  } else if(A===B && A>=limiteAtual){
+    limiteAtual++;
+    msg.textContent=`Empate! Novo limite: ${limiteAtual}`;
+  } else {
+    msg.textContent='';
+  }
+}
 
-    <h3 id="mensagemFinal"></h3>
-  </div>
+function atualizar(){
+  placarA.textContent=A;
+  placarB.textContent=B;
+  placarA.className='placar';
+  placarB.className='placar';
+  if(fim){
+    if(A>B) placarA.classList.add('vencedor'), placarB.classList.add('perdedor');
+    else placarB.classList.add('vencedor'), placarA.classList.add('perdedor');
+  } else {
+    if(A>B) placarA.classList.add('vencedor'), placarB.classList.add('perdedor');
+    else if(B>A) placarB.classList.add('vencedor'), placarA.classList.add('perdedor');
+  }
+}
 
-  <script>
-    let placarA = 0;
-    let placarB = 0;
-    let limite = 15;
-    let jogoFinalizado = false;
+function resetar(){
+  A=0; B=0; fim=false; limiteAtual=limiteBase; msg.textContent=''; atualizar();
+}
 
-    function iniciarJogo() {
-      const select = document.getElementById('limiteSelect');
-      limite = parseInt(select.value);
-      document.getElementById('setup').style.display = 'none';
-      document.getElementById('jogo').style.display = 'block';
-      resetarTudo();
+function confete(){
+  const duration = 3 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  (function frame() {
+    confetti(Object.assign({}, defaults, { particleCount: 7, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+    if (Date.now() < animationEnd) {
+      requestAnimationFrame(frame);
     }
+  })();
+}
+</script>
 
-    function aumentarPlacar(time) {
-      if (jogoFinalizado) return;
-
-      if (time === 'A') {
-        placarA++;
-        document.getElementById('timeA').textContent = `Time A: ${placarA}`;
-        if (placarA >= limite) finalizarJogo('Time A');
-      } else if (time === 'B') {
-        placarB++;
-        document.getElementById('timeB').textContent = `Time B: ${placarB}`;
-        if (placarB >= limite) finalizarJogo('Time B');
-      }
-    }
-
-    function finalizarJogo(vencedor) {
-      jogoFinalizado = true;
-      document.getElementById('mensagemFinal').textContent = `${vencedor} venceu o jogo!`;
-    }
-
-    function zerarPlacar() {
-      placarA = 0;
-      placarB = 0;
-      jogoFinalizado = false;
-      document.getElementById('timeA').textContent = 'Time A: 0';
-      document.getElementById('timeB').textContent = 'Time B: 0';
-      document.getElementById('mensagemFinal').textContent = '';
-    }
-
-    function resetarTudo() {
-      zerarPlacar();
-    }
-  </script>
 </body>
 </html>
